@@ -76,9 +76,25 @@ export default function App() {
     setCantidadInput(1);
   };
 
+  // Eliminar producto del detalle
+  const eliminarDelCarrito = (idProducto: string) => {
+    setCarrito(carrito.filter(item => item.producto.id_producto !== idProducto));
+  };
+
+  // Actualizar cantidad de un producto en el detalle
+  const actualizarCantidad = (idProducto: string, nuevaCantidad: number) => {
+    if (nuevaCantidad < 1) return;
+    setCarrito(carrito.map(item => 
+      item.producto.id_producto === idProducto 
+        ? { ...item, cantidad: nuevaCantidad }
+        : item
+    ));
+  };
+
   // Calcular el total Neto/Bruto estimado de la orden en tiempo real
   const calcularTotal = () => {
-    return carrito.reduce((acc, item) => acc + (item.producto.precio || 0) * item.cantidad, 0);
+    const total = carrito.reduce((acc, item) => acc + (item.producto.precio || 0) * item.cantidad, 0);
+    return total.toLocaleString('es-CL');
   };
 
   // Enviar formulario a Supabase
@@ -359,12 +375,13 @@ export default function App() {
                     <th className="p-3 text-center">Cantidad</th>
                     <th className="p-3 text-right">P. Unitario</th>
                     <th className="p-3 text-right">Subtotal</th>
+                    <th className="p-3 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {carrito.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="p-6 text-center text-gray-400 italic">
+                      <td colSpan={5} className="p-6 text-center text-gray-400 italic">
                         No hay productos en el detalle de esta venta.
                       </td>
                     </tr>
@@ -372,9 +389,36 @@ export default function App() {
                     carrito.map((item, idx) => (
                       <tr key={idx} className="border-b hover:bg-gray-50 text-gray-800">
                         <td className="p-3 font-medium">{item.producto.producto}</td>
-                        <td className="p-3 text-center font-bold">{item.cantidad}</td>
-                        <td className="p-3 text-right">${item.producto.precio || 0}</td>
-                        <td className="p-3 text-right font-semibold">${(item.producto.precio || 0) * item.cantidad}</td>
+                        <td className="p-3 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => actualizarCantidad(item.producto.id_producto, item.cantidad - 1)}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold w-7 h-7 rounded text-lg transition"
+                            >
+                              −
+                            </button>
+                            <span className="font-bold text-lg w-12 text-center">{item.cantidad}</span>
+                            <button
+                              type="button"
+                              onClick={() => actualizarCantidad(item.producto.id_producto, item.cantidad + 1)}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold w-7 h-7 rounded text-lg transition"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </td>
+                        <td className="p-3 text-right">${item.producto.precio?.toLocaleString('es-CL') || 0}</td>
+                        <td className="p-3 text-right font-semibold">${((item.producto.precio || 0) * item.cantidad).toLocaleString('es-CL')}</td>
+                        <td className="p-3 text-center">
+                          <button
+                            type="button"
+                            onClick={() => eliminarDelCarrito(item.producto.id_producto)}
+                            className="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-3 py-1 rounded-lg text-xs transition"
+                          >
+                            Eliminar
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}

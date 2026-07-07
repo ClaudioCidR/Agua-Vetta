@@ -55,25 +55,26 @@ export default function App() {
   // Estado del Carrito / Detalle de venta
   const [carrito, setCarrito] = useState<LineaDetalle[]>([]);
   const [productoSeleccionado, setProductoSeleccionado] = useState<string>('');
-  const [cantidadInput, setCantidadInput] = useState<number>(1);
+  const [cantidadInput, setCantidadInput] = useState<string>('1');
 
   // Agregar producto al detalle
   const agregarAlCarrito = () => {
     const prod = productos.find(p => p.id_producto === productoSeleccionado);
     if (!prod) return;
 
+    const cantidad = parseInt(cantidadInput) || 1;
     const existe = carrito.find(item => item.producto.id_producto === prod.id_producto);
     if (existe) {
       setCarrito(carrito.map(item => 
         item.producto.id_producto === prod.id_producto 
-          ? { ...item, cantidad: item.cantidad + cantidadInput }
+          ? { ...item, cantidad: item.cantidad + cantidad }
           : item
       ));
     } else {
-      setCarrito([...carrito, { producto: prod, cantidad: cantidadInput }]);
+      setCarrito([...carrito, { producto: prod, cantidad }]);
     }
     setProductoSeleccionado('');
-    setCantidadInput(1);
+    setCantidadInput('1');
   };
 
   // Eliminar producto del detalle
@@ -133,6 +134,7 @@ export default function App() {
       setFormaPago(null);
       setCarrito([]);
       setNotas('');
+      setCantidadInput('1');
     }
   };
 
@@ -311,7 +313,10 @@ export default function App() {
                   {/* Botón decrementar */}
                   <button
                     type="button"
-                    onClick={() => setCantidadInput(Math.max(1, cantidadInput - 1))}
+                    onClick={() => {
+                      const actual = parseInt(cantidadInput) || 1;
+                      setCantidadInput(String(Math.max(1, actual - 1)));
+                    }}
                     className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold w-12 h-12 rounded-lg text-2xl transition flex items-center justify-center"
                   >
                     −
@@ -325,15 +330,25 @@ export default function App() {
                     value={cantidadInput}
                     onChange={(e) => {
                       const valor = e.target.value.replace(/[^0-9]/g, '');
-                      setCantidadInput(parseInt(valor) || 1);
+                      setCantidadInput(valor);
                     }}
+                    onBlur={() => {
+                      // Si está vacío o es 0, establecer a 1
+                      if (!cantidadInput || parseInt(cantidadInput) === 0) {
+                        setCantidadInput('1');
+                      }
+                    }}
+                    onFocus={(e) => e.target.select()}
                     className="w-24 border-2 p-3 rounded-lg bg-white text-center text-2xl font-bold focus:outline-blue-500 focus:border-blue-500"
                   />
                   
                   {/* Botón incrementar */}
                   <button
                     type="button"
-                    onClick={() => setCantidadInput(cantidadInput + 1)}
+                    onClick={() => {
+                      const actual = parseInt(cantidadInput) || 1;
+                      setCantidadInput(String(actual + 1));
+                    }}
                     className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold w-12 h-12 rounded-lg text-2xl transition flex items-center justify-center"
                   >
                     +
@@ -345,7 +360,7 @@ export default function App() {
                       <button
                         key={num}
                         type="button"
-                        onClick={() => setCantidadInput(num)}
+                        onClick={() => setCantidadInput(String(num))}
                         className="bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold px-3 py-1 rounded-lg text-sm transition"
                       >
                         {num}

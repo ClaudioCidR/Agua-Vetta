@@ -375,7 +375,7 @@ export default function App() {
                 type="button"
                 onClick={agregarAlCarrito}
                 disabled={!productoSeleccionado}
-                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg shadow-md transition text-lg"
+                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-2 px-3 rounded-lg shadow-md transition text-sm"
               >
                 ✓ Agregar al Detalle
               </button>

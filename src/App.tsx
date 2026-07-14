@@ -4,6 +4,7 @@ import { useProductos } from './hooks/useProductos';
 import { useClientes } from './hooks/useClientes';
 import ClientesMaintainer from './components/ClientesMaintainer';
 import ProductosMaintainer from './components/ProductosMaintainer';
+import ModuloInformes from './components/ModuloInformes';
 
 export default function App() {
   const { productos, fetchProductos } = useProductos();
@@ -17,8 +18,8 @@ export default function App() {
     setError
   } = usePlantaVentas();
 
-  // Vista activa: ventas de planta, mantenedor de clientes o mantenedor de productos
-  const [vista, setVista] = useState<'ventas' | 'clientes' | 'productos'>('ventas');
+  // Vista activa: ventas de planta, mantenedor de clientes, mantenedor de productos o módulo de informes
+  const [vista, setVista] = useState<'ventas' | 'clientes' | 'productos' | 'informes'>('ventas');
 
   // Callback cuando se crea un cliente exitosamente
   const handleClienteCreado = async () => {
@@ -141,9 +142,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-100 p-6 font-sans">
       <header className="mb-6 bg-blue-600 text-white p-4 rounded-xl shadow-md">
-        <h1 className="text-2xl font-bold">Agua Vetta 2.0 - Módulo Planta</h1>
-        <p className="text-sm opacity-90">Registro rápido de ventas para Distribuidores</p>
-        <div className="flex gap-2 mt-3">
+        <h1 className="text-2xl font-bold">Agua Vetta 2.0 - Sistema de Gestión</h1>
+        <p className="text-sm opacity-90">Sistema completo de administración y análisis</p>
+        <div className="flex gap-2 mt-3 flex-wrap">
           <button
             type="button"
             onClick={() => setVista('ventas')}
@@ -171,10 +172,21 @@ export default function App() {
           >
             Mantenedor Productos
           </button>
+          <button
+            type="button"
+            onClick={() => setVista('informes')}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition ${
+              vista === 'informes' ? 'bg-white text-blue-700' : 'bg-blue-700 hover:bg-blue-800'
+            }`}
+          >
+            📊 Centro de Informes
+          </button>
         </div>
       </header>
 
-      {vista === 'clientes' ? (
+      {vista === 'informes' ? (
+        <ModuloInformes />
+      ) : vista === 'clientes' ? (
         <ClientesMaintainer onClienteCreado={handleClienteCreado} />
       ) : vista === 'productos' ? (
         <ProductosMaintainer onProductoCreado={handleProductoCreado} />
